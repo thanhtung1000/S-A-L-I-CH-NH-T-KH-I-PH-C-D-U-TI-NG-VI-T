@@ -7,7 +7,7 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![W&B](https://img.shields.io/badge/Weights_%26_Biases-FFBE00?style=for-the-badge&logo=weightsandbiases&logoColor=black)
 
-Hệ thống công nghiệp đa tầng (Multi-Stage Industrial Pipeline) kết hợp mô hình ngôn ngữ Seq2Seq **ViT5-base** (220M tham số), thuật toán từ điển Trie $O(1)$, bộ lọc an toàn ngữ cảnh (Safety Alignment Gate) và tối ưu hóa suy luận **ONNX Runtime INT8**. Đồ án giải quyết trọn vẹn hai bài toán cốt lõi: **Sửa lỗi chính tả & gõ nhầm QWERTY/vùng miền** và **Khôi phục hoàn toàn dấu thanh tiếng Việt**.
+Hệ thống được thiết kế theo quy trình xử lý 5 bước tự động (5-Stage Pipeline) kết hợp mô hình ngôn ngữ Seq2Seq **ViT5-base** (220M tham số), thuật toán từ điển Trie $O(1)$, bộ lọc an toàn ngữ cảnh (Safety Alignment Gate) và tối ưu hóa suy luận **ONNX Runtime INT8**. Đồ án giải quyết trọn vẹn hai bài toán cốt lõi: **Sửa lỗi chính tả & gõ nhầm QWERTY/vùng miền** và **Khôi phục hoàn toàn dấu thanh tiếng Việt**.
 
 ---
 
@@ -29,7 +29,7 @@ Hệ thống công nghiệp đa tầng (Multi-Stage Industrial Pipeline) kết h
 - **Bảo Toàn Thực Thể & Định Dạng (Entity Anchoring)**: Tự động khóa và bảo vệ Email, URL, tên công nghệ tiếng Anh (như `PyTorch`, `ONNX`, `Sony`, `IBM`) không bị mô hình sửa nhầm.
 - **Cơ Chế Khóa An Toàn (Alignment & Safety Gate)**: Ngăn chặn triệt để hiện tượng sửa thừa (Over-correction) và ảo giác (Hallucination) của mô hình Seq2Seq bằng thuật toán so khớp Levenshtein mức từ.
 - **Tối Ưu Hóa Suy Luận ONNX INT8**: Tốc độ suy luận cực nhanh **10.86 ms/câu** trên CPU, giảm kích thước mô hình xuống 2.01 lần.
-- **Giao Diện Web Demo Streamlit Sang Trọng**: Hỗ trợ tương tác trực quan, tô màu Highlight đánh dấu từ được sửa đổi, phân tích thời gian thực.
+- **Giao Diện Web Demo Streamlit Tương Tác Trực Quan**: Hỗ trợ tương tác trực quan, tô màu Highlight đánh dấu từ được sửa đổi, phân tích thời gian thực.
 
 ---
 
@@ -51,7 +51,7 @@ Hệ thống công nghiệp đa tầng (Multi-Stage Industrial Pipeline) kết h
 
 ## 🏛️ Kiến Trúc Hệ Thống (5-Stage Pipeline)
 
-Hệ thống hoạt động theo mô hình công nghiệp 5 tầng khép kín:
+Hệ thống tự động thực thi qua 5 giai đoạn nối tiếp nhau (5-Stage Pipeline):
 
 ```
 [Văn bản Đầu vào Nhiễu]
@@ -142,7 +142,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Khởi Chạy Giao Diện Web Demo (Streamlit App)
-Chạy ứng dụng Web tương tác sang trọng bằng Streamlit:
+Chạy ứng dụng Web tương tác trực quan bằng Streamlit:
 ```bash
 streamlit run demo_spell_corrector.py
 ```
