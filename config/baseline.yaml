@@ -1,0 +1,7 @@
+# Configuration for Baseline Spell Corrector
+dictionary_path: "data/vsec_data.parquet"
+max_edit_distance: 2
+ngram_order: 3
+alpha: 0.7 # Weight for ngram score vs edit distance score
+language: "vi"
+eval_batch_size: 64

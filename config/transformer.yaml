@@ -1,0 +1,19 @@
+# Configuration for Transformer Seq2Seq Model (ViT5/mT5)
+model_name_or_path: "VietAI/vit5-base"
+max_source_length: 256
+max_target_length: 256
+train_batch_size: 4
+eval_batch_size: 4
+learning_rate: 5.0e-5
+weight_decay: 0.01
+num_train_epochs: 3
+warmup_ratio: 0.1
+gradient_accumulation_steps: 4
+fp16: false
+bf16: false
+beam_search:
+  num_beams: 4
+  length_penalty: 1.0
+wandb:
+  project: "csc4005-csc4007-khmt16-01-spell-correction"
+  entity: null

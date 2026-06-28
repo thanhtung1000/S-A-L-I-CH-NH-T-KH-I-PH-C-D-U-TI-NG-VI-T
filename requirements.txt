@@ -1,0 +1,16 @@
+torch>=2.0.0
+transformers>=4.35.0
+datasets
+scikit-learn
+pandas
+numpy
+matplotlib
+wandb
+evaluate
+onnx
+onnxruntime
+psutil
+rouge-score
+streamlit
+edlib
+pyarrow

@@ -1,0 +1,9 @@
+*.csv
+*.parquet
+*.onnx
+*.pyc
+*.pt
+outputs/models/
+outputs/onnx/
+wandb/
+.vscode/
