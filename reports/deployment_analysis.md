@@ -24,3 +24,16 @@ Báo cáo giải trình kỹ thuật và trả lời 5 câu hỏi trọng tâm t
 ## 5. Nếu triển khai trên máy cấu hình yếu, nhóm sẽ chọn mô hình nào?
 - Nhóm sẽ lựa chọn **Kiến trúc Đa tầng (Multi-stage Pipeline) kết hợp mô hình ONNX INT8 Quantized `vit5-small`**.
 - Nguyên nhân: Tầng màng lọc Error Detector Gate vòng ngoài giúp lọc bỏ 14-20% câu sạch mà không cần tốn tài nguyên AI (thời gian < 1ms). Đối với các câu chứa lỗi, mô hình ONNX INT8 chỉ chiếm ~115MB RAM và phản hồi trong 13ms, cho phép chạy cực mượt ngay cả trên các dòng máy laptop văn phòng không có GPU rời.
+
+
+## Bảng So Sánh Hiệu Năng Thực Nghiệm (PyTorch vs ONNX)
+
+Đo đạc trực tiếp trên tập dữ liệu kiểm thử thực tế:
+
+| Tiêu chí so sánh (Metric) | PyTorch FP32 (Gốc) | ONNX (O2 Optimized) | ONNX Quantized (INT8) |
+|---|---|---|---|
+| Kích thước mô hình (Model Size) | 861.96 MB | 836.10 MB | 215.49 MB |
+| Độ trễ CPU (CPU Latency) | 739.39 ms | 568.76 ms | 194.58 ms |
+| Độ trễ GPU (GPU Latency) | 357.81 ms | 298.18 ms | 238.54 ms |
+| Correction F1-score (%) | 82.44% | 82.39% | 82.29% |
+| Character Error Rate - CER (%) | 4.350% | 4.370% | 4.410% |

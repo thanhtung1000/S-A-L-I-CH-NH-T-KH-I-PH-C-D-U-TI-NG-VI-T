@@ -21,7 +21,7 @@ Mọi con số trong báo cáo này đều có tính truy xuất nguồn gốc 1
 
 Báo cáo chi tiết các giải pháp tối ưu chiến lược giải mã (Beam Search Decoding) để triệt tiêu hiện tượng lặp từ và tự sinh token ảo (hallucination):
 
-### a) Cấu hình Chiến lược Giải mã Chuẩn Công Nghiệp (Beam Search Decoding Constraints):
+### a) Cấu hình Chiến lược Giải mã Tối ưu hóa (Beam Search Decoding Constraints):
 - Để khắc phục hiện tượng lặp n-gram hoặc sinh từ thừa khi giải mã chuỗi Seq2Seq, toàn bộ các script (`unified_master_evaluator.py`, `evaluate_correction.py`, `demo_spell_corrector.py`) đã được bổ sung đồng bộ các ràng buộc:
   - `no_repeat_ngram_size = 3`: Cấm mô hình lặp lại bất kỳ cụm 3 từ nào trong cùng một câu.
   - `repetition_penalty = 1.2`: Phạt năng lượng các token đã xuất hiện để ép mô hình đa dạng hóa từ ngữ.

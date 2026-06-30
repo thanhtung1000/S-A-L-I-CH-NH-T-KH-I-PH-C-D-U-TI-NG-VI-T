@@ -7,7 +7,9 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
 ![W&B](https://img.shields.io/badge/Weights_%26_Biases-FFBE00?style=for-the-badge&logo=weightsandbiases&logoColor=black)
 
-Hệ thống được thiết kế theo quy trình xử lý 5 bước tự động (5-Stage Pipeline) kết hợp mô hình ngôn ngữ Seq2Seq **ViT5-base** (220M tham số), thuật toán từ điển Trie $O(1)$, bộ lọc an toàn ngữ cảnh (Safety Alignment Gate) và tối ưu hóa suy luận **ONNX Runtime INT8**. Đồ án giải quyết trọn vẹn hai bài toán cốt lõi: **Sửa lỗi chính tả & gõ nhầm QWERTY/vùng miền** và **Khôi phục hoàn toàn dấu thanh tiếng Việt**.
+
+Hệ thống được thiết kế theo quy trình xử lý 5 bước tự động (5-Stage Pipeline) kết hợp mô hình ngôn ngữ Seq2Seq **ViT5-base** (220M tham số), thuật toán từ điển Trie $O(1)$, bộ lọc an toàn ngữ cảnh (Safety Alignment Gate) và tối ưu hóa suy luận **ONNX Runtime INT8**. Bài tập lớn giải quyết trọn vẹn hai bài toán cốt lõi: **Sửa lỗi chính tả & gõ nhầm QWERTY/vùng miền** và **Khôi phục hoàn toàn dấu thanh tiếng Việt**.
+
 
 ---
 
@@ -105,7 +107,7 @@ Hệ thống tự động thực thi qua 5 giai đoạn nối tiếp nhau (5-Sta
 │   ├── models/best_model/           # Weights mô hình ViT5 tốt nhất
 │   └── onnx/                        # Mô hình ONNX đã lượng tử hóa INT8
 ├── reports/                         # Thư mục chứa các báo cáo kỹ thuật chuyên sâu
-│   ├── FINAL_SUBMISSION_PROJECT_REPORT.md  # Báo cáo tổng kết đồ án
+│   ├── FINAL_SUBMISSION_PROJECT_REPORT.md  # Báo cáo tổng kết bài tập lớn
 │   ├── ablation_study_and_error_breakdown.md
 │   ├── convergence_and_loss_analysis.md
 │   ├── deployment_analysis.md
@@ -191,13 +193,13 @@ Dự án theo dõi và lưu trữ offline/cloud toàn bộ tiến trình huấn 
 
 - **🔗 Project Dashboard Link**: [W&B Spell Correction Project](https://wandb.ai/csc4005-csc4007-khmt16-01-spell-correction)
 - **Tóm tắt 5 Runs bắt buộc**:
-  1. `run_01_rule_based_baseline`: Mô hình Baseline Edit Distance & N-gram LM.
-  2. `run_02_vit5_small_default`: Fine-tune mô hình baseline `VietAI/vit5-small`.
-  3. `run_03_vit5_base_model`: Fine-tune mô hình ngữ cảnh `VietAI/vit5-base`.
-  4. `run_04_hyperparameter_tuned`: Tuning thuật toán giải mã Beam Search (`num_beams=4`, `repetition_penalty=1.2`).
-  5. `run_05_best_multistage_pipeline`: Mô hình hoàn chỉnh kết hợp ViT5-base và Safety Alignment Gate.
+  1. `run_01_rule_based_baseline`: Bản Baseline SymSpell kết hợp N-gram LM.
+  2. `run_02_vit5_base_greedy`: Mô hình ViT5-base giải mã Greedy (`num_beams=1`).
+  3. `run_03_vit5_base_beam_search`: Mô hình ViT5-base giải mã Beam Search mặc định (`num_beams=4`).
+  4. `run_04_vit5_hyperparameters_tuned`: Tinh chỉnh siêu tham số giải mã Beam Search.
+  5. `run_05_best_model_multistage_pipeline`: Mô hình đề xuất tối ưu nhất (ViT5-base + Safety Gate + Error Detector Gate).
 
 ---
 
-## 📜 Giấy Phép & Đồ Án
-Báo cáo và mã nguồn được xây dựng phục vụ nghiệm thu Đồ án môn học **Xử Lý Ngôn Ngữ Tự Nhiên (CSC4005 / CSC4007)** - Đề tài 10.
+## 📜 Giấy Phép & Bài Tập Lớn
+Báo cáo và mã nguồn được xây dựng phục vụ nghiệm thu Bài tập lớn môn học **Xử Lý Ngôn Ngữ Tự Nhiên (CSC4005 / CSC4007)** - Đề tài 10.

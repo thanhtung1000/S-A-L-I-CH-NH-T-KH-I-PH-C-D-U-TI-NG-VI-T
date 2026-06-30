@@ -71,7 +71,7 @@ def prepare_dataset(parquet_path, tokenizer, max_src_len=256, max_tgt_len=256, m
     processed_ds = ds.map(preprocess_function, batched=True, remove_columns=ds.column_names)
     return processed_ds
 
-def train(config_path="config/transformer.yaml", model_name_override="VietAI/vit5-base", run_name="vit5_convergence_run", train_data_path="data/processed/train.parquet"):
+def train(config_path="config/transformer.yaml", model_name_override="VietAI/vit5-base", run_name="vit5_convergence_run", train_data_path="data/processed/train.parquet", max_samples=None, epochs=3, save_best=False):
     config = load_config(config_path)
     model_name = model_name_override or config.get("model_name_or_path", "VietAI/vit5-base")
     
@@ -88,12 +88,18 @@ def train(config_path="config/transformer.yaml", model_name_override="VietAI/vit
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"[Train ViT5 Convergence] Target Training Device: {device} ({torch.cuda.get_device_name(0) if device=='cuda' else 'CPU'})")
 
-    print(f"[Train ViT5 Convergence] Loading FULL datasets from {train_data_path}...")
-    train_ds = prepare_dataset(train_data_path, tokenizer, max_samples=None)
+    print(f"[Train ViT5 Convergence] Loading datasets from {train_data_path} (max_samples={max_samples})...")
+    train_ds = prepare_dataset(train_data_path, tokenizer, max_samples=max_samples)
     base_dir = "C:/Users/Lenovo/Desktop/Nam4_HK3/NLP/BTL/BTL_Tung2"
-    val_ds = prepare_dataset(f"{base_dir}/data/processed/dev.parquet", tokenizer, max_samples=None)
+    val_ds = prepare_dataset(f"{base_dir}/data/processed/dev.parquet", tokenizer, max_samples=max_samples // 10 if max_samples else None)
     
-    os.environ["WANDB_DISABLED"] = "true"
+    # Kích hoạt tích hợp W&B thật
+    wandb_config = config.get("wandb", {})
+    os.environ["WANDB_PROJECT"] = wandb_config.get("project", "csc4005-csc4007-khmt16-01-spell-correction")
+    os.environ["WANDB_LOG_MODEL"] = "false"
+    if "WANDB_DISABLED" in os.environ:
+        del os.environ["WANDB_DISABLED"]
+        
     metrics_cb = EpochMetricsCallback()
         
     training_args = Seq2SeqTrainingArguments(
@@ -108,14 +114,15 @@ def train(config_path="config/transformer.yaml", model_name_override="VietAI/vit
         weight_decay=float(config["weight_decay"]),
         warmup_ratio=float(config.get("warmup_ratio", 0.1)),
         save_total_limit=2,
-        num_train_epochs=3,
+        num_train_epochs=epochs,
         predict_with_generate=True,
         label_smoothing_factor=0.1,
-        logging_steps=100,
+        logging_steps=10 if max_samples and max_samples <= 1000 else 100,
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
-        report_to="none",
+        report_to="wandb",
+        run_name=run_name,
         fp16=False, # Ensure FP32 numerical stability for T5
     )
     
@@ -134,9 +141,14 @@ def train(config_path="config/transformer.yaml", model_name_override="VietAI/vit
     print("[Train ViT5 Convergence] Starting training execution...")
     trainer.train()
     
-    print(f"[Train ViT5 Convergence] Saving optimal weights to {best_model_dir}...")
-    trainer.save_model(best_model_dir)
-    tokenizer.save_pretrained(best_model_dir)
+    if save_best:
+        print(f"[Train ViT5 Convergence] Saving optimal weights to {best_model_dir}...")
+        trainer.save_model(best_model_dir)
+        tokenizer.save_pretrained(best_model_dir)
+    else:
+        print(f"[Train ViT5 Convergence] Saving weights to specific run directory: {output_dir}...")
+        trainer.save_model(output_dir)
+        tokenizer.save_pretrained(output_dir)
     
     # Save loss history log
     if metrics_cb.epoch_logs:
@@ -149,6 +161,10 @@ if __name__ == "__main__":
     parser.add_argument("--config", type=str, default="config/transformer.yaml")
     parser.add_argument("--model_name", type=str, default="VietAI/vit5-base")
     parser.add_argument("--run_name", type=str, default="vit5_convergence_run")
+    parser.add_argument("--max_samples", type=int, default=None, help="Limit training samples for testing")
+    parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
+    parser.add_argument("--save_best", action="store_true", help="Save final weights over best_model directory")
     args = parser.parse_args()
     
-    train(args.config, args.model_name, args.run_name)
+    train(args.config, args.model_name, args.run_name, 
+          max_samples=args.max_samples, epochs=args.epochs, save_best=args.save_best)

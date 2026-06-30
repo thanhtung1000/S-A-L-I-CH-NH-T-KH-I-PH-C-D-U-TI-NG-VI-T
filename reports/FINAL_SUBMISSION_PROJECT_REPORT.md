@@ -1,16 +1,16 @@
-# BÁO CÁO TỔNG KẾT ĐỒ ÁN MÔN HỌC: XÂY DỰNG HỆ THỐNG SỬA LỖI CHÍNH TẢ VÀ KHÔI PHỤC DẤU TIẾNG VIỆT (TOPIC 10)
+# BÁO CÁO TỔNG KẾT BÀI TẬP LỚN MÔN HỌC: XÂY DỰNG HỆ THỐNG SỬA LỖI CHÍNH TẢ VÀ KHÔI PHỤC DẤU TIẾNG VIỆT (TOPIC 10)
 
 **Môn học:** Xử Lý Ngôn Ngữ Tự Nhiên (CSC4005 / CSC4007)  
-**Kiến trúc Mô hình:** Multi-stage Industrial Pipeline (ViT5 Seq2Seq Transformer + Trie Detector + Safety Alignment Gate + ONNX Runtime INT8)  
+**Kiến trúc Mô hình:** Multi-stage Pipeline (ViT5 Seq2Seq Transformer + Trie Detector + Safety Alignment Gate + ONNX Runtime INT8)  
 **Môi trường Thực thi:** Python 3.10, PyTorch, HuggingFace Transformers, CUDA GPU Acceleration  
 
 ---
 
 ## 📋 TÓM TẮT THỪA HÀNH (EXECUTIVE SUMMARY)
 
-Đồ án giải quyết trọn vẹn hai bài toán cốt lõi trong xử lý văn bản tiếng Việt nhiễu: **Sửa lỗi chính tả & gõ nhầm (Spelling Correction)** và **Khôi phục dấu thanh & dấu chữ hoàn toàn (Diacritic Restoration)**. 
+Bài tập lớn giải quyết trọn vẹn hai bài toán cốt lõi trong xử lý văn bản tiếng Việt nhiễu: **Sửa lỗi chính tả & gõ nhầm (Spelling Correction)** và **Khôi phục dấu thanh & dấu chữ hoàn toàn (Diacritic Restoration)**. 
 
-Hệ thống được thiết kế theo kiến trúc công nghiệp 5 tầng (Multi-stage Pipeline) kết hợp mô hình học sâu học chuỗi `VietAI/vit5-base` (220M tham số). Kết quả kiểm thử định lượng thực tế trên tập test độc lập 1,000 mẫu (`data/processed/test.parquet`) và bộ 19 kịch bản kiểm thử đa ngữ cảnh ghi nhận hiệu năng xuất sắc:
+Hệ thống được thiết kế theo quy trình xử lý đa tầng gồm 5 bước (Multi-stage Pipeline) kết hợp mô hình học sâu học chuỗi `VietAI/vit5-base` (220M tham số). Kết quả kiểm thử định lượng thực tế trên tập test độc lập 1,000 mẫu (`data/processed/test.parquet`) và bộ 19 kịch bản kiểm thử đa ngữ cảnh ghi nhận hiệu năng xuất sắc:
 - **Tỷ lệ đạt bộ đánh giá Đa ngữ cảnh (Multi-Scenario Benchmark):** **89.5% - 94.7% PASSED** (Đạt chuẩn xuất sắc trên các kịch bản kiểm thử thực tế).
 - **Exact Match (Tỷ lệ khớp 100% tuyệt đối trên tập test 1,000 mẫu):** **65.7%** (Hơn 65% số câu trong tập test được khôi phục chính xác từng ký tự).
 - **Character Error Rate (CER):** **3.16% - 4.48%** (Đạt phân cấp Tốt).
@@ -20,9 +20,9 @@ Hệ thống được thiết kế theo kiến trúc công nghiệp 5 tầng (Mu
 
 ---
 
-## 🏛️ 1. KIẾN TRÚC HỆ THỐNG ĐA TẦNG (5-STAGE INDUSTRIAL PIPELINE)
+## 🏛️ 1. KIẾN TRÚC HỆ THỐNG ĐA TẦNG (5-STAGE PIPELINE)
 
-Hệ thống tuân thủ chặt chẽ bản thiết kế chuẩn công nghiệp nhằm tối ưu hóa giữa độ chính xác và tốc độ suy luận suy rộng:
+Hệ thống tuân thủ chặt chẽ bản thiết kế tối ưu hệ thống nhằm tối ưu hóa giữa độ chính xác và tốc độ suy luận suy rộng:
 
 ```
 [Văn bản Đầu vào]
@@ -107,4 +107,4 @@ Bảng trích xuất trực tiếp từ [outputs/benchmarks/multi_scenario_evalu
 
 ## 🎯 5. KẾT LUẬN & HƯỚNG PHÁT TRIỂN TƯƠNG LAI
 
-Đồ án đã xây dựng thành công giải pháp sửa lỗi chính tả và khôi phục dấu tiếng Việt đa tầng hoàn chỉnh, đạt hiệu năng cao và đáp ứng các tiêu chuẩn khắt khe về thời gian suy luận thực tế. Hệ thống đạt tỷ lệ 89.5% - 94.7% trên bộ đánh giá đa ngữ cảnh thực tế, khẳng định tính đóng góp học thuật và khả năng ứng dụng thực tiễn vượt trội.
+Bài tập lớn đã xây dựng thành công giải pháp sửa lỗi chính tả và khôi phục dấu tiếng Việt đa tầng hoàn chỉnh, đạt hiệu năng cao và đáp ứng các tiêu chuẩn khắt khe về thời gian suy luận thực tế. Hệ thống đạt tỷ lệ 89.5% - 94.7% trên bộ đánh giá đa ngữ cảnh thực tế, khẳng định tính đóng góp học thuật và khả năng ứng dụng thực tiễn vượt trội.

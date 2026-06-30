@@ -11,6 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 from evaluate_correction import ProductionMultiStagePipeline
 from safety_gate import AlignmentAndSafetyGate
+import streamlit as st
 
 def run_cli_demo():
     print("=========================================================")
@@ -26,8 +27,47 @@ def run_cli_demo():
         corr = pipeline.process(sample)
         print(" -> Kết quả sau sửa:", corr)
 
+def render_diff_html(original_text: str, corrected_text: str) -> str:
+    import difflib
+    orig_words = original_text.split()
+    corr_words = corrected_text.split()
+    
+    matcher = difflib.SequenceMatcher(None, orig_words, corr_words)
+    opcodes = matcher.get_opcodes()
+    
+    html_parts = []
+    for tag, i1, i2, j1, j2 in opcodes:
+        if tag == 'equal':
+            for i in range(i1, i2):
+                html_parts.append(orig_words[i])
+        elif tag == 'replace':
+            orig_part = " ".join(orig_words[i1:i2])
+            corr_part = " ".join(corr_words[j1:j2])
+            html_parts.append(f'<span style="background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 6px; border-radius: 4px; text-decoration: line-through; font-weight: 600; margin: 0 2px;">{orig_part}</span>')
+            html_parts.append(f'<span style="background-color: rgba(34, 197, 94, 0.2); color: #86efac; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin: 0 2px; box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);">{corr_part}</span>')
+        elif tag == 'delete':
+            orig_part = " ".join(orig_words[i1:i2])
+            html_parts.append(f'<span style="background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 2px 6px; border-radius: 4px; text-decoration: line-through; font-weight: 600; margin: 0 2px;">{orig_part}</span>')
+        elif tag == 'insert':
+            corr_part = " ".join(corr_words[j1:j2])
+            html_parts.append(f'<span style="background-color: rgba(34, 197, 94, 0.2); color: #86efac; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin: 0 2px; box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);">{corr_part}</span>')
+            
+    return " ".join(html_parts)
+
+@st.cache_resource
+def get_pipeline():
+    return ProductionMultiStagePipeline("outputs/models/best_model")
+
+@st.cache_data
+def get_cached_prediction(text_input):
+    if not text_input.strip():
+        return "", ""
+    pipeline = get_pipeline()
+    corr_text = pipeline.process(text_input)
+    highlighted_html = render_diff_html(text_input, corr_text)
+    return corr_text, highlighted_html
+
 def run_streamlit_app():
-    import streamlit as st
     st.set_page_config(
         page_title="DeepL-Grade ViT5 Spell AI",
         page_icon="✨",
@@ -150,15 +190,9 @@ def run_streamlit_app():
         </div>
     """, unsafe_allow_html=True)
     
-    def load_fresh_pipeline():
-        import importlib, evaluate_correction
-        importlib.reload(evaluate_correction)
-        pipe = evaluate_correction.ProductionMultiStagePipeline("outputs/models/best_model")
-        gate = AlignmentAndSafetyGate(edit_distance_threshold=3)
-        return pipe, gate
-        
-    with st.spinner("Đang kết nối AI Engine..."):
-        pipeline, safety_gate = load_fresh_pipeline()
+    # Kích hoạt tải mô hình lần đầu tiên (nếu chưa có trong cache)
+    with st.spinner("Đang kết nối AI Engine (Chỉ tải một lần duy nhất)..."):
+        get_pipeline()
 
     default_sample = "Hoc deep learning tai Dai hoc Nam Can Tho. Lớp em đi chuyenthamquan ở daihoc vq̀ đang nghiencuu khoa hoc."
     
@@ -192,16 +226,14 @@ def run_streamlit_app():
     highlighted_html = ""
     if text_input.strip():
         try:
-            corr_text = pipeline.process(text_input)
-            split_inp = pipeline.split_stuck_words(text_input)
-            aligned = safety_gate.align_tokens(split_inp, corr_text)
-            highlighted_html = safety_gate.render_html_highlight(aligned)
+            corr_text, highlighted_html = get_cached_prediction(text_input)
         except Exception as e:
             st.error(f"Lỗi hệ thống: {e}")
 
     with col_right:
         st.markdown('<div class="card-header-title">✨ Văn Bản Đã Tối Ưu (Result)</div>', unsafe_allow_html=True)
         
+        # 1. Ô kết quả chính (có nút Copy) luôn hiển thị cố định ở trên
         if corr_text:
             st.code(corr_text, language=None)
         else:
@@ -212,11 +244,26 @@ def run_streamlit_app():
                 label_visibility="collapsed",
                 placeholder="Kết quả chuẩn xác sẽ xuất hiện tại đây..."
             )
+            
+        # 2. Bộ chọn 2 nút Radio nằm ngang dưới ô kết quả chính
+        view_mode = st.radio(
+            "Chế độ đối chiếu",
+            options=["Văn bản", "Đối chiếu tô màu trực quan"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
         
-        show_diff = st.checkbox("🔍 Đối chiếu tô màu trực quan (Diff Inspector)", value=False)
+        st.markdown("<div style='margin-bottom: 12px;'></div>", unsafe_allow_html=True)
         
-        if show_diff and highlighted_html:
-            st.markdown('<div class="diff-inspector">' + highlighted_html + '</div>', unsafe_allow_html=True)
+        # 3. Khung hiển thị thứ hai (ô to ở dưới cùng) hiển thị dựa trên chế độ chọn
+        if corr_text:
+            if view_mode == "Văn bản":
+                st.markdown('<div class="diff-inspector">' + corr_text + '</div>', unsafe_allow_html=True)
+            elif view_mode == "Đối chiếu tô màu trực quan":
+                if highlighted_html:
+                    st.markdown('<div class="diff-inspector">' + highlighted_html + '</div>', unsafe_allow_html=True)
+                else:
+                    st.info("Không phát hiện thay đổi nào so với câu gốc.")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--cli":

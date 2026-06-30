@@ -1,0 +1,14 @@
+W&B Project Dashboard Link:
+https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction
+
+Tracked Runs Summary (5 Runs Required by Assignment - Customized to base model project):
+1. run_01_rule_based_baseline (Baseline SymSpell + N-gram model)
+   - URL: https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction/runs/q5l34skw
+2. run_02_vit5_base_greedy (ViT5-base model with Greedy decoding, num_beams=1)
+   - URL: https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction/runs/f3yir6j3
+3. run_03_vit5_base_beam_search (ViT5-base model with default Beam Search decoding, num_beams=4)
+   - URL: https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction/runs/wlzdibl8
+4. run_04_vit5_hyperparameters_tuned (ViT5-base model with tuned Beam Search: length_penalty=1.0, repetition_penalty=1.2)
+   - URL: https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction/runs/opczb8gr
+5. run_05_best_model_multistage_pipeline (Proposed Optimal Multi-stage Pipeline: ViT5-base + Error Detector Gate + Safety Gate)
+   - URL: https://wandb.ai/letrongthanhtung5-daina-middleton/csc4005-csc4007-khmt16-01-spell-correction/runs/zt3jv95c
